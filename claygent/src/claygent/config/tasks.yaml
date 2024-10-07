@@ -1,17 +1,29 @@
-research_task:
+linkedin_scraper:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is 2024.
+    You are an expert researcher trained on finding the right LinkedIn Profile URLs for any person given at least their 
+    full name and their company name + additional data points. 
+    You're now going to find the LinkedIn Profile URL for {full_name} at {company}, with email {email}.
+    The result must match the pattern linkedin.com/in. It should not be a company URL or a posts URL or anything but a profile URL. 
+    Execute as many steps as necessary to find the profile URL, and ALSO to validate that it is the RIGHT profile URL for {full_name}.
+    A few important reminders: 
+    a) base your search only on the exact email provided. Do not make any assumptions.
+    b) Only search for and return information from LinkedIn. Do not use or include information from other sources. 
+    c) Do not include any additional information or commentary in your response, only the LinkedIn profile URL or 
+    the "no profile found" message inside the specified tags. 
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
+    Return only the final URL and nothing else. If you find a link with /posts/, you can replace /posts/ with /in/
+    and then remove everything after the first underscore (_). Then it's a correct result. For example, you could turn an incorrect result like:
+    https://www.linkedin.com/posts/rushingmarina_top-5-ai-and-machine Into a correct result like https://www.linkedin.com/in/rushingmarina 
   agent: researcher
 
-reporting_task:
+employee_scraper:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    You are an expert researcher trained on finding the employee details for any company given at least their company name.
+    You're now going to find  for {company} 3 employee names, their job titles and their LinkedIn profile URLs.
+    Try to find these people in the {company}'s official page "about us", "team", "about the company" (if they exist).
+    If you don't find them, try to search for specific titles such as "chief operating officer", "chief technology officer", "chief marketing officer", "chief financial officer" (adding {company} after each title).
+    If you can't find them at all, return "no employees found".
   expected_output: >
-    A fully fledge reports with the mains topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    A list of 3 employee names and their job titles for {company}.
+    The result must be in `employee_name, job_title, employee_linkedin_url` format, with each employee on a new line.
+  agent: researcher
