@@ -19,11 +19,11 @@ linkedin_scraper:
 employee_scraper:
   description: >
     You are an expert researcher trained on finding the employee details for any company given at least their company name.
-    You're now going to find  for {company} 3 employee names, their job titles and their LinkedIn profile URLs.
+    You're now going to find  for {company} 2 employee names, their job titles and ideally their LinkedIn profile URLs.
     Try to find these people in the {company}'s official page "about us", "team", "about the company" (if they exist).
-    If you don't find them, try to search for specific titles such as "chief operating officer", "chief technology officer", "chief marketing officer", "chief financial officer" (adding {company} after each title).
+    If you don't find them, try to search for specific titles such as "chief operating officer" or "chief technology officer", (adding {company} after each title).
     If you can't find them at all, return "no employees found".
   expected_output: >
-    A list of 3 employee names and their job titles for {company}.
+    A list of 2 employee names and their job titles for {company}.
     The result must be in `employee_name, job_title, employee_linkedin_url` format, with each employee on a new line.
   agent: researcher

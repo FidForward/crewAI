@@ -39,6 +39,64 @@ This command initializes the claygent Crew, assembling the agents and assigning 
 
 This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
 
+## Using the Exposed API
+
+The Claygent Crew now exposes an API that allows you to interact with the AI agents and execute tasks. Here's how to use it:
+
+1. Start the API server:
+   ```bash
+   cd src/claygent
+   uvicorn main:app --reload
+   ```
+   This will start the FastAPI server on `http://localhost:8000`.
+
+2. The API exposes a single endpoint: `/run_task`
+
+3. To execute a task, send a POST request to `http://localhost:8000/run_task` with the following JSON body:
+   ```json
+   {
+     "task_name": "linkedin_scraper",
+     "input_data": {
+       "full_name": "John Doe",
+       "company": "Example Corp",
+       "email": "john.doe@example.com"
+     }
+   }
+   ```
+   or
+   ```json
+   {
+     "task_name": "employee_scraper",
+     "input_data": {
+       "company": "Example Corp"
+     }
+   }
+   ```
+
+4. The API will return a JSON response with the results of the task execution:
+   ```json
+   {
+     "linkedin_scraper": "Result from LinkedIn scraper task",
+     "employee_scraper": "Result from employee scraper task"
+   }
+   ```
+
+5. You can use tools like cURL, Postman, or any programming language with HTTP request capabilities to interact with this API.
+
+Example using cURL:
+```bash
+curl -X POST http://localhost:8000/run_task \
+-H "Content-Type: application/json" \
+-d '{
+"task_name": "linkedin_scraper",
+"input_data": {
+"full_name": "John Doe",
+"company": "Example Corp",
+"email": "john.doe@example.com"
+}
+}'
+```
+
 ## Understanding Your Crew
 
 The claygent Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
