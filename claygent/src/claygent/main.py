@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import sys
-from claygent.crew import ClaygentCrew
+from .crew import ClaygentCrew
+from .api import app
 
 def run():
     """

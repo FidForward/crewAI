@@ -7,7 +7,6 @@ Welcome to the Claygent Crew project, powered by [crewAI](https://crewai.com). T
 Ensure you have Python >=3.10 <=3.13 installed on your system. This project uses [Poetry](https://python-poetry.org/) for dependency management and package handling.
 
 To install the dependencies:
-
 ```bash
 crewai install
 ```
@@ -40,25 +39,32 @@ The Claygent Crew exposes an API that allows you to interact with the AI agents 
 
 1. Start the API server:
    ```bash
-   cd claygent/src/claygent
-   uvicorn main:app --reload
+   cd claygent/
+   uvicorn src.claygent.api:app --reload
    ```
 
-2. The API exposes a single endpoint: `/run_task`
+2. The API exposes two endpoints:
+   - `/linkedin_scraper`: For LinkedIn scraping tasks
+   - `/employee_scraper`: For employee scraping tasks
 
-3. To execute a task, send a POST request to `http://localhost:8000/` with a JSON body containing `task_name` and `input_data`.
+3. To execute a task, send a POST request to the appropriate endpoint with the required JSON body.
 
 4. The API will return a JSON response with the results of the task execution.
 
-Example using cURL:
+Examples using cURL:
+
+For LinkedIn scraper:
 ```bash
-curl -X POST http://localhost:8000/ -H "Content-Type: application/json" -d '{
-"task_name": "linkedin_scraper",
-"input_data": {
+curl -X POST http://localhost:8000/linkedin_scraper -H "Content-Type: application/json" -d '{
 "full_name": "John Doe",
 "company": "Example Corp",
 "email": "john.doe@example.com"
-}
+}'
+```
+For Employee scraper:
+```bash
+curl -X POST http://localhost:8000/employee_scraper -H "Content-Type: application/json" -d '{
+"company": "Example Corp"
 }'
 ```
 
@@ -75,3 +81,4 @@ For support, questions, or feedback regarding the Claygent Crew or crewAI:
 - [Chat with our docs](https://chatg.pt/DWjSBZn)
 
 Let's create wonders together with the power and simplicity of crewAI.
+
