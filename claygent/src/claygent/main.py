@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from .crew import ClaygentCrew
 from .api import app
+import sys
 
 def run():
     """
@@ -23,8 +24,8 @@ def run():
     print("\nRunning employee scraper...")
     employee_inputs = {
         'company': 'Pleez',
-        'full_name': 'Miguel Cerqueira Martins', 
-        'email': 'miguel.martins@trypleez.com'
+        'company_url': 'https://www.trypleez.com',
+        'ceo_name': 'Miguel CerqueiraMartins'
     }
     employee_result = crew_instance.run_employee_scraper(employee_inputs)
     print("Employee scraper result:", employee_result)
@@ -41,7 +42,9 @@ def train():
     inputs = {
         'full_name': 'John Doe',
         'company': 'Example Corp',
-        'email': 'john.doe@example.com'
+        'email': 'john.doe@example.com',
+        'company_url': 'https://www.example.com',
+        'ceo_name': 'John Doe'
     }
     try:
         crew_instance = ClaygentCrew()
@@ -66,7 +69,9 @@ def test():
     inputs = {
         'full_name': 'John Doe',
         'company': 'Example Corp',
-        'email': 'john.doe@example.com'
+        'email': 'john.doe@example.com',
+        'company_url': 'https://www.example.com',
+        'ceo_name': 'John Doe'
     }
     try:
         crew_instance = ClaygentCrew()

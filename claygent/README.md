@@ -39,7 +39,7 @@ The Claygent Crew exposes an API that allows you to interact with the AI agents 
 
 1. Start the API server:
    ```bash
-   cd claygent/
+   cd claygent
    uvicorn src.claygent.api:app --reload
    ```
 
@@ -67,6 +67,11 @@ curl -X POST http://localhost:8000/employee_scraper -H "Content-Type: applicatio
 "company": "Example Corp"
 }'
 ```
+
+To expose the local API, in a new terminal window start ngrok:
+   ```bash
+   ngrok http 8000
+   ```
 
 ## Understanding Your Crew
 

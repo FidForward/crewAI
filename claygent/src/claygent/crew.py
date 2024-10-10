@@ -2,10 +2,21 @@ import os
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
+import yaml
 
 @CrewBase
 class ClaygentCrew():
 	"""Claygent crew"""
+
+	def __init__(self):
+		self.load_config()
+
+	def load_config(self):
+		config_dir = os.path.join(os.path.dirname(__file__), 'config')
+		with open(os.path.join(config_dir, 'agents.yaml'), 'r') as f:
+			self.agents_config = yaml.safe_load(f)
+		with open(os.path.join(config_dir, 'tasks.yaml'), 'r') as f:
+			self.tasks_config = yaml.safe_load(f)
 
 	@agent
 	def researcher(self) -> Agent:

@@ -11,20 +11,25 @@ linkedin_scraper:
     c) Do not include any additional information or commentary in your response, only the LinkedIn profile URL or 
     the "no profile found" message inside the specified tags. 
   expected_output: >
-    Return only the final URL and nothing else. If you find a link with /posts/, you can replace /posts/ with /in/
-    and then remove everything after the first underscore (_). Then it's a correct result. For example, you could turn an incorrect result like:
-    https://www.linkedin.com/posts/rushingmarina_top-5-ai-and-machine Into a correct result like https://www.linkedin.com/in/rushingmarina 
+    Return a JSON object with a single key "linkedin_url" and the value being the final URL.
+    If no profile is found, set the value to null. For example:
+    {"linkedin_url": "https://www.linkedin.com/in/johndoe"} or {"linkedin_url": null}
   agent: researcher
 
 employee_scraper:
   description: >
-    You are an expert researcher trained on finding the employee details for any company given at least their company name.
-    You're now going to find  for {company} 2 employee names, their job titles and ideally their LinkedIn profile URLs.
-    Prior to this, I found out the co-founder of the company is {full_name} and his/her email is {email}.
-    Try to find these people in the {company}'s official page "about us", "team", "about the company" (if they exist).
-    If you don't find them, try to search for specific titles such as "chief operating officer" or "chief technology officer", (adding {company} after each title).
-    If you can't find them at all, return "no employees found".
+    You are an expert researcher trained on finding employee details for any company given their company name and website URL.
+    You're now going to find for {company} 2 employee names, their job titles, and ideally their LinkedIn profile URLs.
+    Use the company's official website {company_url} to search for an "about us", "team", or "about the company" page (if they exist).
+    If you don't find employees there, try to search for specific titles such as "chief operating officer" or "chief technology officer" on the website or through a web search.
+    Important: Exclude the CEO {ceo_name} from your search results.
+    If you can't find any employees at all (other than the CEO), return an empty list.
   expected_output: >
-    A list of 2 employee names and their job titles for {company}.
-    The result must be in `employee_name, job_title, employee_linkedin_url` format, with each employee on a new line.
+    Return a JSON array of objects, each containing "name", "job_title", and "linkedin_url" (if found) for up to 2 employees, excluding the CEO.
+    For example:
+    [
+      {"name": "Jane Smith", "job_title": "Chief Operating Officer", "linkedin_url": "https://www.linkedin.com/in/janesmith"},
+      {"name": "Mike Johnson", "job_title": "Chief Technology Officer", "linkedin_url": null}
+    ]
+    If no employees are found, return an empty array: []
   agent: researcher

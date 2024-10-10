@@ -15,13 +15,15 @@ class LinkedInScraperInput(BaseModel):
 
 class EmployeeScraperInput(BaseModel):
     company: str
+    company_url: str
+    ceo_name: str
 
 @app.post("/linkedin_scraper")
 async def linkedin_scraper(input_data: LinkedInScraperInput):
     try:
         crew_instance = ClaygentCrew()
         result = crew_instance.run_linkedin_scraper(input_data.dict())
-        return {"result": result}
+        return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -30,7 +32,7 @@ async def employee_scraper(input_data: EmployeeScraperInput):
     try:
         crew_instance = ClaygentCrew()
         result = crew_instance.run_employee_scraper(input_data.dict())
-        return {"result": result}
+        return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
