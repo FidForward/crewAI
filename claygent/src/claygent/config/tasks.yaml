@@ -20,6 +20,7 @@ employee_scraper:
   description: >
     You are an expert researcher trained on finding the employee details for any company given at least their company name.
     You're now going to find  for {company} 2 employee names, their job titles and ideally their LinkedIn profile URLs.
+    Prior to this, I found out the co-founder of the company is {full_name} and his/her email is {email}.
     Try to find these people in the {company}'s official page "about us", "team", "about the company" (if they exist).
     If you don't find them, try to search for specific titles such as "chief operating officer" or "chief technology officer", (adding {company} after each title).
     If you can't find them at all, return "no employees found".

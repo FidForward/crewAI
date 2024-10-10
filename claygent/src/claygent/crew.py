@@ -10,52 +10,76 @@ class ClaygentCrew():
 	@agent
 	def researcher(self) -> Agent:
 		return Agent(
-			config=self.agents_config['researcher'],
+			role=self.agents_config['researcher']['role'],
+			goal=self.agents_config['researcher']['goal'],
+			backstory=self.agents_config['researcher']['backstory'],
 			verbose=True,
 			tools=[SerperDevTool(n_results=3)],
-			max_iter=2,
-			openai_api_key=os.getenv("OPENAI_API_KEY")
+			max_iter=2
 		)
 
 	@task
 	def linkedin_scraper_task(self) -> Task:
 		return Task(
-			config=self.tasks_config['linkedin_scraper'],
-				verbose=True
+			description=self.tasks_config['linkedin_scraper']['description'],
+			expected_output=self.tasks_config['linkedin_scraper']['expected_output'],
+			agent=self.researcher()
 		)
   
 	@task
 	def employee_scraper_task(self) -> Task:
 		return Task(
-			config=self.tasks_config['employee_scraper'],
-				verbose=True
+			description=self.tasks_config['employee_scraper']['description'],
+			expected_output=self.tasks_config['employee_scraper']['expected_output'],
+			agent=self.researcher()
 		)
 
 	@crew
-	def crew(self) -> Crew:
-		"""Creates the Claygent crew"""
+	def linkedin_crew(self) -> Crew:
+		"""Creates the LinkedIn scraper crew"""
 		return Crew(
 			agents=[self.researcher()],
-			tasks=[self.linkedin_scraper_task(), self.employee_scraper_task()],
+			tasks=[self.linkedin_scraper_task()],
 			process=Process.sequential,
-   			verbose=True,
-			# process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
+			verbose=True,
 		)
 
-	def run_task(self, task_name: str, inputs: dict):
-		crew = self.crew()
+	@crew
+	def employee_crew(self) -> Crew:
+		"""Creates the employee scraper crew"""
+		return Crew(
+			agents=[self.researcher()],
+			tasks=[self.employee_scraper_task()],
+			process=Process.sequential,
+			verbose=True,
+		)
+
+	def run_linkedin_scraper(self, inputs: dict):
+		crew = self.linkedin_crew()
 		result = crew.kickoff(inputs=inputs)
-		
-		# Extract raw results from tasks
-		task_results = {
-			'linkedin_scraper': None,
-			'employee_scraper': None
-		}
-		
-		for task in result.tasks_output:
-			if task.name == 'linkedin_scraper_task':
-				task_results['linkedin_scraper'] = task.raw
-			elif task.name == 'employee_scraper_task':
-				task_results['employee_scraper'] = task.raw
-		
-		return task_results
+		return result.raw if result else None
+
+	def run_employee_scraper(self, inputs: dict):
+		crew = self.employee_crew()
+		result = crew.kickoff(inputs=inputs)
+		return result.raw if result else None
+
+	def run_task(self, task_name, inputs):
+		if task_name == "linkedin_scraper":
+			return self.run_linkedin_scraper(inputs)
+		elif task_name == "employee_scraper":
+			return self.run_employee_scraper(inputs)
+		else:
+			raise ValueError(f"Unknown task: {task_name}")
+
+	def train(self, n_iterations, filename, inputs):
+		# Implement training logic
+		pass
+
+	def replay(self, task_id):
+		# Implement replay logic
+		pass
+
+	def test(self, n_iterations, openai_model_name, inputs):
+		# Implement test logic
+		pass

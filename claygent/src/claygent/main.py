@@ -1,35 +1,78 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from crew import ClaygentCrew
-import yaml
-from dotenv import load_dotenv
-import os
+#!/usr/bin/env python
+import sys
+from claygent.crew import ClaygentCrew
 
-# Load environment variables
-load_dotenv()
+def run():
+    """
+    Run the crew for both LinkedIn and employee scraping.
+    """
+    linkedin_inputs = {
+        'full_name': 'Miguel CerqueiraMartins',
+        'company': 'Pleez',
+        'email': 'miguel.martins@trypleez.com'
+    }
+    
+    crew_instance = ClaygentCrew()
+    
+    # Run LinkedIn scraper
+    print("Running LinkedIn scraper...")
+    linkedin_result = crew_instance.run_linkedin_scraper(linkedin_inputs)
+    print("LinkedIn scraper result:", linkedin_result)
+    
+    # Run employee scraper
+    print("\nRunning employee scraper...")
+    employee_inputs = {
+        'company': 'Pleez',
+        'full_name': 'Miguel Cerqueira Martins', 
+        'email': 'miguel.martins@trypleez.com'
+    }
+    employee_result = crew_instance.run_employee_scraper(employee_inputs)
+    print("Employee scraper result:", employee_result)
+    
+    return {
+        "linkedin_result": linkedin_result,
+        "employee_result": employee_result
+    }
 
-app = FastAPI()
-
-# Load tasks configuration
-with open('config/tasks.yaml', 'r') as file:
-    tasks_config = yaml.safe_load(file)
-
-class TaskInput(BaseModel):
-    task_name: str
-    input_data: dict
-
-@app.post("/run_task")
-async def run_task(task_input: TaskInput):
-    if task_input.task_name not in tasks_config:
-        raise HTTPException(status_code=400, detail="Invalid task name")
-
+def train():
+    """
+    Train the crew for a given number of iterations.
+    """
+    inputs = {
+        'full_name': 'John Doe',
+        'company': 'Example Corp',
+        'email': 'john.doe@example.com'
+    }
     try:
         crew_instance = ClaygentCrew()
-        results = crew_instance.run_task(task_input.task_name, task_input.input_data)
-        return results
+        crew_instance.train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise Exception(f"An error occurred while training the crew: {e}")
+
+def replay():
+    """
+    Replay the crew execution from a specific task.
+    """
+    try:
+        crew_instance = ClaygentCrew()
+        crew_instance.replay(task_id=sys.argv[1])
+    except Exception as e:
+        raise Exception(f"An error occurred while replaying the crew: {e}")
+
+def test():
+    """
+    Test the crew execution and returns the results.
+    """
+    inputs = {
+        'full_name': 'John Doe',
+        'company': 'Example Corp',
+        'email': 'john.doe@example.com'
+    }
+    try:
+        crew_instance = ClaygentCrew()
+        crew_instance.test(n_iterations=int(sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
+    except Exception as e:
+        raise Exception(f"An error occurred while testing the crew: {e}")
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    globals()[sys.argv[1]]()

@@ -1,24 +1,18 @@
 # Claygent Crew
 
-Welcome to the Claygent Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+Welcome to the Claygent Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI.
 
 ## Installation
 
-Ensure you have Python >=3.10 <=3.13 installed on your system. This project uses [Poetry](https://python-poetry.org/) for dependency management and package handling, offering a seamless setup and execution experience.
+Ensure you have Python >=3.10 <=3.13 installed on your system. This project uses [Poetry](https://python-poetry.org/) for dependency management and package handling.
 
-First, if you haven't already, install Poetry:
+To install the dependencies:
 
-```bash
-pip install poetry
-```
-
-Next, navigate to your project directory and install the dependencies:
-
-1. First lock the dependencies and install them by using the CLI command:
 ```bash
 crewai install
 ```
-### Customizing
+
+## Customizing
 
 **Add your `OPENAI_API_KEY` into the `.env` file**
 
@@ -32,6 +26,7 @@ crewai install
 To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
 
 ```bash
+$ cd claygent/
 $ crewai run
 ```
 
@@ -41,53 +36,23 @@ This example, unmodified, will run the create a `report.md` file with the output
 
 ## Using the Exposed API
 
-The Claygent Crew now exposes an API that allows you to interact with the AI agents and execute tasks. Here's how to use it:
+The Claygent Crew exposes an API that allows you to interact with the AI agents and execute tasks:
 
 1. Start the API server:
    ```bash
-   cd src/claygent
+   cd claygent/src/claygent
    uvicorn main:app --reload
    ```
-   This will start the FastAPI server on `http://localhost:8000`.
 
 2. The API exposes a single endpoint: `/run_task`
 
-3. To execute a task, send a POST request to `http://localhost:8000/run_task` with the following JSON body:
-   ```json
-   {
-     "task_name": "linkedin_scraper",
-     "input_data": {
-       "full_name": "John Doe",
-       "company": "Example Corp",
-       "email": "john.doe@example.com"
-     }
-   }
-   ```
-   or
-   ```json
-   {
-     "task_name": "employee_scraper",
-     "input_data": {
-       "company": "Example Corp"
-     }
-   }
-   ```
+3. To execute a task, send a POST request to `http://localhost:8000/` with a JSON body containing `task_name` and `input_data`.
 
-4. The API will return a JSON response with the results of the task execution:
-   ```json
-   {
-     "linkedin_scraper": "Result from LinkedIn scraper task",
-     "employee_scraper": "Result from employee scraper task"
-   }
-   ```
-
-5. You can use tools like cURL, Postman, or any programming language with HTTP request capabilities to interact with this API.
+4. The API will return a JSON response with the results of the task execution.
 
 Example using cURL:
 ```bash
-curl -X POST http://localhost:8000/run_task \
--H "Content-Type: application/json" \
--d '{
+curl -X POST http://localhost:8000/ -H "Content-Type: application/json" -d '{
 "task_name": "linkedin_scraper",
 "input_data": {
 "full_name": "John Doe",
@@ -103,7 +68,7 @@ The claygent Crew is composed of multiple AI agents, each with unique roles, goa
 
 ## Support
 
-For support, questions, or feedback regarding the Claygent Crew or crewAI.
+For support, questions, or feedback regarding the Claygent Crew or crewAI:
 - Visit our [documentation](https://docs.crewai.com)
 - Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
 - [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
