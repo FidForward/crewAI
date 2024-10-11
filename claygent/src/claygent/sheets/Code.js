@@ -21,6 +21,7 @@ const FIELD_MAPPING = {
     'company': 'Company',
     'company_url': 'Company URL',
     'ceo_name': 'Full Name',
+    'country': 'Country', 
     'employees': 'Employee names'  // This is an output field
   },
   'language_detector': {
@@ -77,7 +78,8 @@ function processRow(sheet, headers, rowData, rowIndex) {
   }
 
   try {
-    // Process LinkedIn scraper
+    // Process LinkedIn scraper (disabled for now)
+    /*
     const linkedInUrlCol = headers.indexOf(FIELD_MAPPING.linkedin_scraper.linkedin_url);
     if (linkedInUrlCol !== -1) {
       const cell = sheet.getRange(rowIndex, linkedInUrlCol + 1);
@@ -96,6 +98,7 @@ function processRow(sheet, headers, rowData, rowIndex) {
     } else {
       Logger.log(`LinkedIn URL column not found for row ${rowIndex}`);
     }
+    */
 
     // Process Employee scraper
     const employeesCol = headers.indexOf(FIELD_MAPPING.employee_scraper.employees);

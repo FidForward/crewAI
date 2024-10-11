@@ -25,7 +25,7 @@ class ClaygentCrew():
 			goal=self.agents_config['researcher']['goal'],
 			backstory=self.agents_config['researcher']['backstory'],
 			verbose=True,
-			tools=[SerperDevTool(n_results=3)],
+			tools=[SerperDevTool(n_results=10)],
 			max_iter=2
 		)
 

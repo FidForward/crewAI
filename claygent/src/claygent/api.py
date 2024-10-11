@@ -17,6 +17,7 @@ class EmployeeScraperInput(BaseModel):
     company: str
     company_url: str
     ceo_name: str
+    country: str  # Add this line
 
 class LanguageDetectorInput(BaseModel):
     full_name: str

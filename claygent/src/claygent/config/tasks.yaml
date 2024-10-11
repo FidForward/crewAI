@@ -18,11 +18,10 @@ linkedin_scraper:
 employee_scraper:
   description: >
     You are an expert researcher trained on finding employee details for any company given their company name and website URL.
-    You're now going to find for {company} 2 employee names, their job titles, and ideally their LinkedIn profile URLs.
-    Use the company's official website {company_url} to search for an "about us", "team", or "about the company" page (if they exist).
-    If you don't find employees there, try to search for specific titles such as "coo", "cto", "vp", "director", "manager", or similar.
+    You're now going to find for {company} 3 employee names, using the search "site:linkedin.com/in/ {company_url} {country}".
+    If this doesn't work, use the company's official website {company_url} to search for an "about us", "team", or "about the company" page (if they exist).
+    If you don't find employees there, try to search for specific titles such as "coo", "cto", "vp", "director", "manager", "sales" or "engineer".
     Important: Exclude the CEO {ceo_name} from your search results.
-    Also important: there might be several versions of {company}, so use the exact URL {company_url} to find the correct one.
     If you can't find any employees at all (other than the CEO), return an empty list.
   expected_output: >
     Return the list of employee names, separated by commas, without quotes or any other formatting, or an empty string if no employees are found.

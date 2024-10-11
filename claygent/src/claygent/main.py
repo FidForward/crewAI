@@ -13,6 +13,7 @@ def run():
         'email': 'afonso.pinheiro@trypleez.com',
         'ceo_name': 'Afonso Pinheiro',
         'company_url': 'https://www.trypleez.com',
+        'country': 'Portugal',
     }
     
     crew_instance = ClaygentCrew()
@@ -47,7 +48,8 @@ def train():
         'company': 'Example Corp',
         'email': 'john.doe@example.com',
         'company_url': 'https://www.example.com',
-        'ceo_name': 'John Doe'
+        'ceo_name': 'John Doe',
+        'country': 'United States',
     }
     try:
         crew_instance = ClaygentCrew()
@@ -74,6 +76,7 @@ def test():
         'company': 'Example Corp',
         'email': 'john.doe@example.com',
         'company_url': 'https://www.example.com',
+        'country': 'United States',
     }
     try:
         crew_instance = ClaygentCrew()
