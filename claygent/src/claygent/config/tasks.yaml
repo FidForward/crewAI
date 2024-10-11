@@ -39,3 +39,14 @@ language_detector:
     Return the language name (e.g. English, Spanish, French, etc.), without quotes or any other formatting, or an empty string if no language is found.
     Don't include any additional information or commentary in your response.
   agent: researcher
+
+human_resources_detector:
+  description: >
+    You are an expert researcher trained on detecting if a company founder has ever commented on any Human Resources topics.
+    You're now going to detect if {ceo_name} from {company}, with website {company_url}, has ever commented on any Human Resources topics.
+    Research the person's online content, including their LinkedIn profile, Twitter profile, and any other online profiles.
+    Assume by default that the person has not commented on any Human Resources topics, unless you can find evidence otherwise.
+  expected_output: >
+    Return a reference to the tweet or article if the person has ever commented on any Human Resources topics, or an empty string otherwise.
+    Don't include any additional information or commentary in your response.
+  agent: researcher

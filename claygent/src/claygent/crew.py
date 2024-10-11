@@ -53,6 +53,14 @@ class ClaygentCrew():
 			agent=self.researcher()
 		)
 
+	@task
+	def hr_detector_task(self) -> Task:
+		return Task(
+			description=self.tasks_config['human_resources_detector']['description'],
+			expected_output=self.tasks_config['human_resources_detector']['expected_output'],
+			agent=self.researcher()
+		)
+
 	@crew
 	def linkedin_crew(self) -> Crew:
 		"""Creates the LinkedIn scraper crew"""
@@ -83,6 +91,16 @@ class ClaygentCrew():
 			verbose=True,
 		)
 
+	@crew
+	def hr_detector_crew(self) -> Crew:
+		"""Creates the HR detector crew"""
+		return Crew(
+			agents=[self.researcher()],
+			tasks=[self.hr_detector_task()],
+			process=Process.sequential,
+			verbose=True,
+		)
+
 	def run_linkedin_scraper(self, inputs: dict):
 		crew = self.linkedin_crew()
 		result = crew.kickoff(inputs=inputs)
@@ -98,6 +116,11 @@ class ClaygentCrew():
 		result = crew.kickoff(inputs=inputs)
 		return result.raw if result else None
 
+	def run_hr_detector(self, inputs: dict):
+		crew = self.hr_detector_crew()
+		result = crew.kickoff(inputs=inputs)
+		return result.raw if result else None
+
 	def run_task(self, task_name, inputs):
 		if task_name == "linkedin_scraper":
 			return self.run_linkedin_scraper(inputs)
@@ -105,6 +128,8 @@ class ClaygentCrew():
 			return self.run_employee_scraper(inputs)
 		elif task_name == "language_detector":
 			return self.run_language_detector(inputs)
+		elif task_name == "hr_detector":
+			return self.run_hr_detector(inputs)
 		else:
 			raise ValueError(f"Unknown task: {task_name}")
 

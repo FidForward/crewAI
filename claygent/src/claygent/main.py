@@ -5,7 +5,7 @@ import sys
 
 def run():
     """
-    Run the crew for LinkedIn, employee scraping, and language detection.
+    Run the crew for LinkedIn, employee scraping, language detection, and HR detection.
     """
     inputs = {
         'full_name': 'Afonso Pinheiro',
@@ -33,10 +33,16 @@ def run():
     language_result = crew_instance.run_language_detector(inputs)
     print("Language detector result:", language_result)
     
+    # Run HR detector
+    print("\nRunning HR detector...")
+    hr_result = crew_instance.run_hr_detector(inputs)
+    print("HR detector result:", hr_result)
+    
     return {
         "linkedin_result": linkedin_result,
         "employee_result": employee_result,
-        "language_result": language_result
+        "language_result": language_result,
+        "hr_result": hr_result
     }
 
 def train():

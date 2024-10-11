@@ -29,6 +29,12 @@ const FIELD_MAPPING = {
     'company': 'Company',
     'email': 'Email',
     'preferred_language': 'Preferred Language'  // This is an output field
+  },
+  'hr_detector': {
+    'ceo_name': 'Full Name',
+    'company': 'Company',
+    'company_url': 'Company URL',
+    'hr_comment': 'HR Comment'  // This is an output field
   }
 };
 
@@ -142,6 +148,30 @@ function processRow(sheet, headers, rowData, rowIndex) {
       }
     } else {
       Logger.log(`Preferred Language column not found for row ${rowIndex}`);
+    }
+
+    // Process HR detector
+    const hrCommentCol = headers.indexOf(FIELD_MAPPING.hr_detector.hr_comment);
+    if (hrCommentCol !== -1) {
+      const cell = sheet.getRange(rowIndex, hrCommentCol + 1);
+      if (cell.isBlank()) {
+        Logger.log('Calling HR detector API');
+        const result = callApi('hr_detector', {
+          ceo_name: employeeInputs.ceo_name,
+          company: employeeInputs.company,
+          company_url: employeeInputs.company_url
+        });
+        Logger.log(`HR detector result: ${result}`);
+        Logger.log(`Attempting to write "${result}" to cell (${rowIndex}, ${hrCommentCol + 1})`);
+        cell.setValue(result);
+        Logger.log(`Cell value after setting: ${cell.getValue()}`);
+        SpreadsheetApp.flush();
+        Logger.log(`Updated HR Comment data in cell (${rowIndex}, ${hrCommentCol + 1}): ${result}`);
+      } else {
+        Logger.log(`HR Comment cell (${rowIndex}, ${hrCommentCol + 1}) is already filled. Skipping.`);
+      }
+    } else {
+      Logger.log(`HR Comment column not found for row ${rowIndex}`);
     }
   } catch (error) {
     Logger.log(`Error processing row ${rowIndex}: ${error.toString()}`);
