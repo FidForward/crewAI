@@ -12,8 +12,7 @@ linkedin_scraper:
     the "no profile found" message inside the specified tags. 
   expected_output: >
     Return a JSON object with a single key "linkedin_url" and the value being the final URL.
-    If no profile is found, set the value to null. For example:
-    {"linkedin_url": "https://www.linkedin.com/in/johndoe"} or {"linkedin_url": null}
+    If no profile is found, set the value to null.
   agent: researcher
 
 employee_scraper:
@@ -26,10 +25,5 @@ employee_scraper:
     If you can't find any employees at all (other than the CEO), return an empty list.
   expected_output: >
     Return a JSON array of objects, each containing "name", "job_title", and "linkedin_url" (if found) for up to 2 employees, excluding the CEO.
-    For example:
-    [
-      {"name": "Jane Smith", "job_title": "Chief Operating Officer", "linkedin_url": "https://www.linkedin.com/in/janesmith"},
-      {"name": "Mike Johnson", "job_title": "Chief Technology Officer", "linkedin_url": null}
-    ]
     If no employees are found, return an empty array: []
   agent: researcher

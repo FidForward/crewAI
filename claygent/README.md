@@ -39,8 +39,7 @@ The Claygent Crew exposes an API that allows you to interact with the AI agents 
 
 1. Start the API server:
    ```bash
-   cd claygent
-   uvicorn src.claygent.api:app --reload
+   uvicorn src.claygent.main:app --reload
    ```
 
 2. The API exposes two endpoints:
@@ -73,6 +72,52 @@ To expose the local API, in a new terminal window start ngrok:
    ngrok http 8000
    ```
 
+## Google Sheets Integration with Clasp
+
+This project uses Clasp to manage the Google Apps Script for Google Sheets integration. Follow these steps to set up and push your Clasp files:
+
+1. Install Clasp globally if you haven't already:
+   ```bash
+   npm install -g @google/clasp
+   ```
+
+2. Navigate to the Google Apps Script directory:
+   ```bash
+   cd src/claygent/sheets
+   ```
+
+3. Login to your Google account:
+   ```bash
+   clasp login
+   ```
+
+4. If you're connecting to an existing Google Apps Script project, clone it:
+   ```bash
+   clasp clone <scriptId>
+   ```
+   Replace `<scriptId>` with your actual script ID from the script's URL.
+
+   If you're creating a new script, use:
+   ```bash
+   clasp create --title "Claygent Sheets Integration" --rootDir .
+   ```
+
+5. Push your local files to the Google Apps Script project:
+   ```bash
+   clasp push
+   ```
+
+6. To open the script in the Google Apps Script editor:
+   ```bash
+   clasp open
+   ```
+
+Remember to update the `API_BASE_URL` in your `Code.js` file with your ngrok URL before pushing changes.
+
+Note: Make sure to add `.clasp.json` to your `.gitignore` file to avoid committing sensitive information.
+
+After making changes to your local script files, always remember to push the changes using `clasp push` from the `src/claygent/sheets` directory.
+
 ## Understanding Your Crew
 
 The claygent Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
@@ -86,4 +131,3 @@ For support, questions, or feedback regarding the Claygent Crew or crewAI:
 - [Chat with our docs](https://chatg.pt/DWjSBZn)
 
 Let's create wonders together with the power and simplicity of crewAI.
-
