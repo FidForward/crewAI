@@ -22,6 +22,12 @@ const FIELD_MAPPING = {
     'company_url': 'Company URL',
     'ceo_name': 'Full Name',
     'employees': 'Employee names'  // This is an output field
+  },
+  'language_detector': {
+    'full_name': 'Full Name',
+    'company': 'Company',
+    'email': 'Email',
+    'preferred_language': 'Preferred Language'  // This is an output field
   }
 };
 
@@ -38,11 +44,16 @@ function processSheet() {
 
   Logger.log(`Processing ${data.length - 1} rows`);
 
-  for (let row = 1; row < data.length; row++) {
-    processRow(sheet, headers, data[row], row + 1);
+  try {
+    for (let row = 1; row < data.length; row++) {
+      processRow(sheet, headers, data[row], row + 1);
+    }
+    Logger.log('Finished processing all rows');
+  } catch (error) {
+    Logger.log(`Error: ${error.toString()}`);
+    SpreadsheetApp.getUi().alert(`Error: ${error.toString()}`);
+    throw error;
   }
-
-  Logger.log('Finished processing all rows');
 }
 
 function processRow(sheet, headers, rowData, rowIndex) {
@@ -65,38 +76,73 @@ function processRow(sheet, headers, rowData, rowIndex) {
     }
   }
 
-  // Process LinkedIn scraper
-  const linkedInUrlCol = headers.indexOf(FIELD_MAPPING.linkedin_scraper.linkedin_url);
-  if (linkedInUrlCol !== -1) {
-    Logger.log('Calling LinkedIn scraper API');
-    const result = callApi('linkedin_scraper', linkedInInputs);
-    Logger.log(`LinkedIn scraper result: ${JSON.stringify(result)}`);
-    const cell = sheet.getRange(rowIndex, linkedInUrlCol + 1);
-    const stringifiedResult = JSON.stringify(result);
-    Logger.log(`Attempting to write "${stringifiedResult}" to cell (${rowIndex}, ${linkedInUrlCol + 1})`);
-    cell.setValue(stringifiedResult);
-    Logger.log(`Cell value after setting: ${cell.getValue()}`);
-    SpreadsheetApp.flush();
-    Logger.log(`Updated LinkedIn data in cell (${rowIndex}, ${linkedInUrlCol + 1}): ${stringifiedResult}`);
-  } else {
-    Logger.log(`LinkedIn URL column not found for row ${rowIndex}`);
-  }
+  try {
+    // Process LinkedIn scraper
+    const linkedInUrlCol = headers.indexOf(FIELD_MAPPING.linkedin_scraper.linkedin_url);
+    if (linkedInUrlCol !== -1) {
+      const cell = sheet.getRange(rowIndex, linkedInUrlCol + 1);
+      if (cell.isBlank()) {
+        Logger.log('Calling LinkedIn scraper API');
+        const result = callApi('linkedin_scraper', linkedInInputs);
+        Logger.log(`LinkedIn scraper result: ${result}`);
+        Logger.log(`Attempting to write "${result}" to cell (${rowIndex}, ${linkedInUrlCol + 1})`);
+        cell.setValue(result);
+        Logger.log(`Cell value after setting: ${cell.getValue()}`);
+        SpreadsheetApp.flush();
+        Logger.log(`Updated LinkedIn data in cell (${rowIndex}, ${linkedInUrlCol + 1}): ${result}`);
+      } else {
+        Logger.log(`LinkedIn URL cell (${rowIndex}, ${linkedInUrlCol + 1}) is already filled. Skipping.`);
+      }
+    } else {
+      Logger.log(`LinkedIn URL column not found for row ${rowIndex}`);
+    }
 
-  // Process Employee scraper
-  const employeesCol = headers.indexOf(FIELD_MAPPING.employee_scraper.employees);
-  if (employeesCol !== -1) {
-    Logger.log('Calling Employee scraper API');
-    const result = callApi('employee_scraper', employeeInputs);
-    Logger.log(`Employee scraper result: ${JSON.stringify(result)}`);
-    const cell = sheet.getRange(rowIndex, employeesCol + 1);
-    const stringifiedResult = JSON.stringify(result);
-    Logger.log(`Attempting to write "${stringifiedResult}" to cell (${rowIndex}, ${employeesCol + 1})`);
-    cell.setValue(stringifiedResult);
-    Logger.log(`Cell value after setting: ${cell.getValue()}`);
-    SpreadsheetApp.flush();
-    Logger.log(`Updated Employees data in cell (${rowIndex}, ${employeesCol + 1}): ${stringifiedResult}`);
-  } else {
-    Logger.log(`Employees column not found for row ${rowIndex}`);
+    // Process Employee scraper
+    const employeesCol = headers.indexOf(FIELD_MAPPING.employee_scraper.employees);
+    if (employeesCol !== -1) {
+      const cell = sheet.getRange(rowIndex, employeesCol + 1);
+      if (cell.isBlank()) {
+        Logger.log('Calling Employee scraper API');
+        const result = callApi('employee_scraper', employeeInputs);
+        Logger.log(`Employee scraper result: ${result}`);
+        Logger.log(`Attempting to write "${result}" to cell (${rowIndex}, ${employeesCol + 1})`);
+        cell.setValue(result);
+        Logger.log(`Cell value after setting: ${cell.getValue()}`);
+        SpreadsheetApp.flush();
+        Logger.log(`Updated Employees data in cell (${rowIndex}, ${employeesCol + 1}): ${result}`);
+      } else {
+        Logger.log(`Employees cell (${rowIndex}, ${employeesCol + 1}) is already filled. Skipping.`);
+      }
+    } else {
+      Logger.log(`Employees column not found for row ${rowIndex}`);
+    }
+
+    // Process Language detector
+    const languageCol = headers.indexOf(FIELD_MAPPING.language_detector.preferred_language);
+    if (languageCol !== -1) {
+      const cell = sheet.getRange(rowIndex, languageCol + 1);
+      if (cell.isBlank()) {
+        Logger.log('Calling Language detector API');
+        const result = callApi('language_detector', {
+          full_name: linkedInInputs.full_name,
+          company: linkedInInputs.company,
+          email: linkedInInputs.email
+        });
+        Logger.log(`Language detector result: ${result}`);
+        Logger.log(`Attempting to write "${result}" to cell (${rowIndex}, ${languageCol + 1})`);
+        cell.setValue(result);
+        Logger.log(`Cell value after setting: ${cell.getValue()}`);
+        SpreadsheetApp.flush();
+        Logger.log(`Updated Language data in cell (${rowIndex}, ${languageCol + 1}): ${result}`);
+      } else {
+        Logger.log(`Preferred Language cell (${rowIndex}, ${languageCol + 1}) is already filled. Skipping.`);
+      }
+    } else {
+      Logger.log(`Preferred Language column not found for row ${rowIndex}`);
+    }
+  } catch (error) {
+    Logger.log(`Error processing row ${rowIndex}: ${error.toString()}`);
+    throw new Error(`Processing stopped at row ${rowIndex}: ${error.toString()}`);
   }
 }
 
@@ -115,14 +161,14 @@ function callApi(endpoint, data) {
     const responseText = response.getContentText();
     Logger.log(`API Response Code: ${responseCode}`);
     Logger.log(`API Response: ${responseText}`);
+    
     if (responseCode >= 200 && responseCode < 300) {
-      return JSON.parse(responseText);
+      return responseText.trim();  // Remove any leading/trailing whitespace
     } else {
-      Logger.log(`API returned error code ${responseCode}: ${responseText}`);
-      return null;
+      throw new Error(`API returned error code ${responseCode}: ${responseText}`);
     }
   } catch (error) {
     Logger.log(`API Error: ${error.toString()}`);
-    return null;
+    throw new Error(`API is not available: ${error.toString()}`);
   }
 }

@@ -11,8 +11,8 @@ linkedin_scraper:
     c) Do not include any additional information or commentary in your response, only the LinkedIn profile URL or 
     the "no profile found" message inside the specified tags. 
   expected_output: >
-    Return a JSON object with a single key "linkedin_url" and the value being the final URL.
-    If no profile is found, set the value to null.
+    Return only the LinkedIn profile URL, without quotes or any other formatting, or an empty string if no profile is found. 
+    Don't include any additional information or commentary in your response.
   agent: researcher
 
 employee_scraper:
@@ -20,10 +20,23 @@ employee_scraper:
     You are an expert researcher trained on finding employee details for any company given their company name and website URL.
     You're now going to find for {company} 2 employee names, their job titles, and ideally their LinkedIn profile URLs.
     Use the company's official website {company_url} to search for an "about us", "team", or "about the company" page (if they exist).
-    If you don't find employees there, try to search for specific titles such as "chief operating officer" or "chief technology officer" on the website or through a web search.
+    If you don't find employees there, try to search for specific titles such as "coo", "cto", "vp", "director", "manager", or similar.
     Important: Exclude the CEO {ceo_name} from your search results.
+    Also important: there might be several versions of {company}, so use the exact URL {company_url} to find the correct one.
     If you can't find any employees at all (other than the CEO), return an empty list.
   expected_output: >
-    Return a JSON array of objects, each containing "name", "job_title", and "linkedin_url" (if found) for up to 2 employees, excluding the CEO.
-    If no employees are found, return an empty array: []
+    Return the list of employee names, separated by commas, without quotes or any other formatting, or an empty string if no employees are found.
+    Don't include any additional information or commentary in your response.
+  agent: researcher
+
+language_detector:
+  description: >
+    You are an expert researcher trained on detecting the preferred speaking language of a person given their name and company name.
+    You're now going to detect the language that {full_name} would prefer to speak given that they work at {company}.
+    Research the person's online content, including their LinkedIn profile, Twitter profile, and any other online profiles.
+    Assume by default that the person speaks English, unless you can find evidence otherwise.
+    A good indicator of the language is the person's email address {email}, from which you can often determine the language by its domain.
+  expected_output: >
+    Return the language name (e.g. English, Spanish, French, etc.), without quotes or any other formatting, or an empty string if no language is found.
+    Don't include any additional information or commentary in your response.
   agent: researcher

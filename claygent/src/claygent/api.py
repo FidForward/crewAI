@@ -18,6 +18,11 @@ class EmployeeScraperInput(BaseModel):
     company_url: str
     ceo_name: str
 
+class LanguageDetectorInput(BaseModel):
+    full_name: str
+    company: str
+    email: str
+
 @app.post("/linkedin_scraper")
 async def linkedin_scraper(input_data: LinkedInScraperInput):
     try:
@@ -32,6 +37,15 @@ async def employee_scraper(input_data: EmployeeScraperInput):
     try:
         crew_instance = ClaygentCrew()
         result = crew_instance.run_employee_scraper(input_data.dict())
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/language_detector")
+async def language_detector(input_data: LanguageDetectorInput):
+    try:
+        crew_instance = ClaygentCrew()
+        result = crew_instance.run_language_detector(input_data.dict())
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

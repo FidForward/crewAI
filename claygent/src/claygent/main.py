@@ -5,34 +5,37 @@ import sys
 
 def run():
     """
-    Run the crew for both LinkedIn and employee scraping.
+    Run the crew for LinkedIn, employee scraping, and language detection.
     """
-    linkedin_inputs = {
-        'full_name': 'Miguel CerqueiraMartins',
+    inputs = {
+        'full_name': 'Afonso Pinheiro',
         'company': 'Pleez',
-        'email': 'miguel.martins@trypleez.com'
+        'email': 'afonso.pinheiro@trypleez.com',
+        'ceo_name': 'Afonso Pinheiro',
+        'company_url': 'https://www.trypleez.com',
     }
     
     crew_instance = ClaygentCrew()
     
     # Run LinkedIn scraper
     print("Running LinkedIn scraper...")
-    linkedin_result = crew_instance.run_linkedin_scraper(linkedin_inputs)
+    linkedin_result = crew_instance.run_linkedin_scraper(inputs)
     print("LinkedIn scraper result:", linkedin_result)
     
     # Run employee scraper
     print("\nRunning employee scraper...")
-    employee_inputs = {
-        'company': 'Pleez',
-        'company_url': 'https://www.trypleez.com',
-        'ceo_name': 'Miguel CerqueiraMartins'
-    }
-    employee_result = crew_instance.run_employee_scraper(employee_inputs)
+    employee_result = crew_instance.run_employee_scraper(inputs)
     print("Employee scraper result:", employee_result)
+    
+    # Run language detector
+    print("\nRunning language detector...")
+    language_result = crew_instance.run_language_detector(inputs)
+    print("Language detector result:", language_result)
     
     return {
         "linkedin_result": linkedin_result,
-        "employee_result": employee_result
+        "employee_result": employee_result,
+        "language_result": language_result
     }
 
 def train():
@@ -71,7 +74,6 @@ def test():
         'company': 'Example Corp',
         'email': 'john.doe@example.com',
         'company_url': 'https://www.example.com',
-        'ceo_name': 'John Doe'
     }
     try:
         crew_instance = ClaygentCrew()
