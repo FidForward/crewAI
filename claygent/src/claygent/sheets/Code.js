@@ -151,28 +151,28 @@ function processRow(sheet, headers, rowData, rowIndex) {
     }
 
     // Process HR detector
-    const hrCommentCol = headers.indexOf(FIELD_MAPPING.hr_detector.hr_comment);
-    if (hrCommentCol !== -1) {
-      const cell = sheet.getRange(rowIndex, hrCommentCol + 1);
-      if (cell.isBlank()) {
-        Logger.log('Calling HR detector API');
-        const result = callApi('hr_detector', {
-          ceo_name: employeeInputs.ceo_name,
-          company: employeeInputs.company,
-          company_url: employeeInputs.company_url
-        });
-        Logger.log(`HR detector result: ${result}`);
-        Logger.log(`Attempting to write "${result}" to cell (${rowIndex}, ${hrCommentCol + 1})`);
-        cell.setValue(result);
-        Logger.log(`Cell value after setting: ${cell.getValue()}`);
-        SpreadsheetApp.flush();
-        Logger.log(`Updated HR Comment data in cell (${rowIndex}, ${hrCommentCol + 1}): ${result}`);
-      } else {
-        Logger.log(`HR Comment cell (${rowIndex}, ${hrCommentCol + 1}) is already filled. Skipping.`);
-      }
-    } else {
-      Logger.log(`HR Comment column not found for row ${rowIndex}`);
-    }
+    // const hrCommentCol = headers.indexOf(FIELD_MAPPING.hr_detector.hr_comment);
+    // if (hrCommentCol !== -1) {
+    //   const cell = sheet.getRange(rowIndex, hrCommentCol + 1);
+    //   if (cell.isBlank()) {
+    //     Logger.log('Calling HR detector API');
+    //     const result = callApi('hr_detector', {
+    //       ceo_name: employeeInputs.ceo_name,
+    //       company: employeeInputs.company,
+    //       company_url: employeeInputs.company_url
+    //     });
+    //     Logger.log(`HR detector result: ${result}`);
+    //     Logger.log(`Attempting to write "${result}" to cell (${rowIndex}, ${hrCommentCol + 1})`);
+    //     cell.setValue(result);
+    //     Logger.log(`Cell value after setting: ${cell.getValue()}`);
+    //     SpreadsheetApp.flush();
+    //     Logger.log(`Updated HR Comment data in cell (${rowIndex}, ${hrCommentCol + 1}): ${result}`);
+    //   } else {
+    //     Logger.log(`HR Comment cell (${rowIndex}, ${hrCommentCol + 1}) is already filled. Skipping.`);
+    //   }
+    // } else {
+    //   Logger.log(`HR Comment column not found for row ${rowIndex}`);
+    // }
   } catch (error) {
     Logger.log(`Error processing row ${rowIndex}: ${error.toString()}`);
     throw new Error(`Processing stopped at row ${rowIndex}: ${error.toString()}`);
