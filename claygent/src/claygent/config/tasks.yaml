@@ -13,7 +13,7 @@ linkedin_scraper:
   expected_output: >
     Return only the LinkedIn profile URL, without quotes or any other formatting, or an empty string if no profile is found. 
     Don't include any additional information or commentary in your response.
-  agent: researcher
+  agent: people_researcher
 
 employee_scraper:
   description: >
@@ -26,7 +26,7 @@ employee_scraper:
   expected_output: >
     Return the list of employee names, separated by commas, without quotes or any other formatting, or an empty string if no employees are found.
     Don't include any additional information or commentary in your response.
-  agent: researcher
+  agent: people_researcher
 
 language_detector:
   description: >
@@ -38,7 +38,7 @@ language_detector:
   expected_output: >
     Return the language name (e.g. English, Spanish, French, etc.), without quotes or any other formatting, or an empty string if no language is found.
     Don't include any additional information or commentary in your response.
-  agent: researcher
+  agent: people_researcher
 
 human_resources_detector:
   description: >
@@ -49,4 +49,4 @@ human_resources_detector:
   expected_output: >
     Return a reference to the tweet or article if the person has ever commented on any Human Resources topics, or an empty string otherwise.
     Don't include any additional information or commentary in your response.
-  agent: researcher
+  agent: people_researcher

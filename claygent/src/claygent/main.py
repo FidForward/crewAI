@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from .crew import ClaygentCrew
-from .api import app
 import sys
 
 def run():
@@ -42,7 +41,7 @@ def run():
         "linkedin_result": linkedin_result,
         "employee_result": employee_result,
         "language_result": language_result,
-        "hr_result": hr_result
+        "hr_result": hr_result,
     }
 
 def train():

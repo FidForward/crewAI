@@ -19,14 +19,15 @@ class ClaygentCrew():
 			self.tasks_config = yaml.safe_load(f)
 
 	@agent
-	def researcher(self) -> Agent:
+	def people_researcher(self) -> Agent:
 		return Agent(
-			role=self.agents_config['researcher']['role'],
-			goal=self.agents_config['researcher']['goal'],
-			backstory=self.agents_config['researcher']['backstory'],
+			role=self.agents_config['people_researcher']['role'],
+			goal=self.agents_config['people_researcher']['goal'],
+			backstory=self.agents_config['people_researcher']['backstory'],
+			llm=self.agents_config['people_researcher']['llm'],
 			verbose=True,
 			tools=[SerperDevTool(n_results=10)],
-			max_iter=2
+			max_iter=5
 		)
 
 	@task
@@ -34,7 +35,7 @@ class ClaygentCrew():
 		return Task(
 			description=self.tasks_config['linkedin_scraper']['description'],
 			expected_output=self.tasks_config['linkedin_scraper']['expected_output'],
-			agent=self.researcher()
+			agent=self.people_researcher()
 		)
   
 	@task
@@ -42,7 +43,7 @@ class ClaygentCrew():
 		return Task(
 			description=self.tasks_config['employee_scraper']['description'],
 			expected_output=self.tasks_config['employee_scraper']['expected_output'],
-			agent=self.researcher()
+			agent=self.people_researcher()
 		)
 
 	@task
@@ -50,7 +51,7 @@ class ClaygentCrew():
 		return Task(
 			description=self.tasks_config['language_detector']['description'],
 			expected_output=self.tasks_config['language_detector']['expected_output'],
-			agent=self.researcher()
+			agent=self.people_researcher()
 		)
 
 	@task
@@ -58,14 +59,14 @@ class ClaygentCrew():
 		return Task(
 			description=self.tasks_config['human_resources_detector']['description'],
 			expected_output=self.tasks_config['human_resources_detector']['expected_output'],
-			agent=self.researcher()
+			agent=self.people_researcher()
 		)
 
 	@crew
 	def linkedin_crew(self) -> Crew:
 		"""Creates the LinkedIn scraper crew"""
 		return Crew(
-			agents=[self.researcher()],
+			agents=[self.people_researcher()],
 			tasks=[self.linkedin_scraper_task()],
 			process=Process.sequential,
 			verbose=True,
@@ -75,7 +76,7 @@ class ClaygentCrew():
 	def employee_crew(self) -> Crew:
 		"""Creates the employee scraper crew"""
 		return Crew(
-			agents=[self.researcher()],
+			agents=[self.people_researcher()],
 			tasks=[self.employee_scraper_task()],
 			process=Process.sequential,
 			verbose=True,
@@ -85,7 +86,7 @@ class ClaygentCrew():
 	def language_detector_crew(self) -> Crew:
 		"""Creates the language detector crew"""
 		return Crew(
-			agents=[self.researcher()],
+			agents=[self.people_researcher()],
 			tasks=[self.language_detector_task()],
 			process=Process.sequential,
 			verbose=True,
@@ -95,7 +96,7 @@ class ClaygentCrew():
 	def hr_detector_crew(self) -> Crew:
 		"""Creates the HR detector crew"""
 		return Crew(
-			agents=[self.researcher()],
+			agents=[self.people_researcher()],
 			tasks=[self.hr_detector_task()],
 			process=Process.sequential,
 			verbose=True,
