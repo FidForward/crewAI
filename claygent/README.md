@@ -39,7 +39,7 @@ The Claygent Crew exposes an API that allows you to interact with the AI agents 
 
 1. Start the API server:
    ```bash
-   uvicorn src.claygent.main:app --reload
+   uvicorn claygent.src.claygent.main:app --reload
    ```
 
 2. The API exposes two endpoints:

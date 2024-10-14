@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = 'https://0f6a-79-148-212-9.ngrok-free.app';
+const API_BASE_URL = 'https://7c82-5-225-69-121.ngrok-free.app';
 
 // Add a menu item to run the script
 function onOpen() {

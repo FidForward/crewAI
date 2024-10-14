@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from .crew import ClaygentCrew
+from .api import app
 import sys
 
 def run():
