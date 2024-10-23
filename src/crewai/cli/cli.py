@@ -14,13 +14,14 @@ from .authentication.main import AuthenticationCommand
 from .deploy.main import DeployCommand
 from .evaluate_crew import evaluate_crew
 from .install_crew import install_crew
+from .kickoff_flow import kickoff_flow
 from .plot_flow import plot_flow
 from .replay_from_task import replay_task_command
 from .reset_memories_command import reset_memories_command
 from .run_crew import run_crew
-from .run_flow import run_flow
 from .tools.main import ToolCommand
 from .train_crew import train_crew
+from .update_crew import update_crew
 
 
 @click.group()
@@ -31,10 +32,11 @@ def crewai():
 @crewai.command()
 @click.argument("type", type=click.Choice(["crew", "pipeline", "flow"]))
 @click.argument("name")
-def create(type, name):
+@click.option("--provider", type=str, help="The provider to use for the crew")
+def create(type, name, provider):
     """Create a new crew, pipeline, or flow."""
     if type == "crew":
-        create_crew(name)
+        create_crew(name, provider)
     elif type == "pipeline":
         create_pipeline(name)
     elif type == "flow":
@@ -189,6 +191,12 @@ def run():
 
 
 @crewai.command()
+def update():
+    """Update the pyproject.toml of the Crew project to use uv."""
+    update_crew()
+
+
+@crewai.command()
 def signup():
     """Sign Up/Login to CrewAI+."""
     AuthenticationCommand().signup()
@@ -276,7 +284,13 @@ def tool_install(handle: str):
 
 
 @tool.command(name="publish")
-@click.option("--force", is_flag=True, show_default=True, default=False, help="Bypasses Git remote validations")
+@click.option(
+    "--force",
+    is_flag=True,
+    show_default=True,
+    default=False,
+    help="Bypasses Git remote validations",
+)
 @click.option("--public", "is_public", flag_value=True, default=False)
 @click.option("--private", "is_public", flag_value=False)
 def tool_publish(is_public: bool, force: bool):
@@ -291,11 +305,11 @@ def flow():
     pass
 
 
-@flow.command(name="run")
+@flow.command(name="kickoff")
 def flow_run():
-    """Run the Flow."""
+    """Kickoff the Flow."""
     click.echo("Running the Flow")
-    run_flow()
+    kickoff_flow()
 
 
 @flow.command(name="plot")

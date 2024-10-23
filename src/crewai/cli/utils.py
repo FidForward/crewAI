@@ -1,13 +1,15 @@
+import importlib.metadata
 import os
 import shutil
-import click
 import sys
-import importlib.metadata
+from functools import reduce
+from typing import Any, Dict, List
+
+import click
+from rich.console import Console
 
 from crewai.cli.authentication.utils import TokenManager
-from functools import reduce
-from rich.console import Console
-from typing import Any, Dict, List
+from crewai.cli.constants import ENV_VARS
 
 if sys.version_info >= (3, 11):
     import tomllib
@@ -55,17 +57,14 @@ def simple_toml_parser(content):
 def parse_toml(content):
     if sys.version_info >= (3, 11):
         return tomllib.loads(content)
-    else:
-        return simple_toml_parser(content)
+    return simple_toml_parser(content)
 
 
 def get_project_name(
     pyproject_path: str = "pyproject.toml", require: bool = False
 ) -> str | None:
     """Get the project name from the pyproject.toml file."""
-    return _get_project_attribute(
-        pyproject_path, ["tool", "poetry", "name"], require=require
-    )
+    return _get_project_attribute(pyproject_path, ["project", "name"], require=require)
 
 
 def get_project_version(
@@ -73,7 +72,7 @@ def get_project_version(
 ) -> str | None:
     """Get the project version from the pyproject.toml file."""
     return _get_project_attribute(
-        pyproject_path, ["tool", "poetry", "version"], require=require
+        pyproject_path, ["project", "version"], require=require
     )
 
 
@@ -82,7 +81,7 @@ def get_project_description(
 ) -> str | None:
     """Get the project description from the pyproject.toml file."""
     return _get_project_attribute(
-        pyproject_path, ["tool", "poetry", "description"], require=require
+        pyproject_path, ["project", "description"], require=require
     )
 
 
@@ -97,10 +96,9 @@ def _get_project_attribute(
             pyproject_content = parse_toml(f.read())
 
         dependencies = (
-            _get_nested_value(pyproject_content, ["tool", "poetry", "dependencies"])
-            or {}
+            _get_nested_value(pyproject_content, ["project", "dependencies"]) or []
         )
-        if "crewai" not in dependencies:
+        if not any(True for dep in dependencies if "crewai" in dep):
             raise Exception("crewai is not in the dependencies.")
 
         attribute = _get_nested_value(pyproject_content, keys)
@@ -203,3 +201,76 @@ def tree_find_and_replace(directory, find, replace):
                 new_dirpath = os.path.join(path, new_dirname)
                 old_dirpath = os.path.join(path, dirname)
                 os.rename(old_dirpath, new_dirpath)
+
+
+def load_env_vars(folder_path):
+    """
+    Loads environment variables from a .env file in the specified folder path.
+
+    Args:
+    - folder_path (Path): The path to the folder containing the .env file.
+
+    Returns:
+    - dict: A dictionary of environment variables.
+    """
+    env_file_path = folder_path / ".env"
+    env_vars = {}
+    if env_file_path.exists():
+        with open(env_file_path, "r") as file:
+            for line in file:
+                key, _, value = line.strip().partition("=")
+                if key and value:
+                    env_vars[key] = value
+    return env_vars
+
+
+def update_env_vars(env_vars, provider, model):
+    """
+    Updates environment variables with the API key for the selected provider and model.
+
+    Args:
+    - env_vars (dict): Environment variables dictionary.
+    - provider (str): Selected provider.
+    - model (str): Selected model.
+
+    Returns:
+    - None
+    """
+    api_key_var = ENV_VARS.get(
+        provider,
+        [
+            click.prompt(
+                f"Enter the environment variable name for your {provider.capitalize()} API key",
+                type=str,
+            )
+        ],
+    )[0]
+
+    if api_key_var not in env_vars:
+        try:
+            env_vars[api_key_var] = click.prompt(
+                f"Enter your {provider.capitalize()} API key", type=str, hide_input=True
+            )
+        except click.exceptions.Abort:
+            click.secho("Operation aborted by the user.", fg="red")
+            return None
+    else:
+        click.secho(f"API key already exists for {provider.capitalize()}.", fg="yellow")
+
+    env_vars["MODEL"] = model
+    click.secho(f"Selected model: {model}", fg="green")
+    return env_vars
+
+
+def write_env_file(folder_path, env_vars):
+    """
+    Writes environment variables to a .env file in the specified folder.
+
+    Args:
+    - folder_path (Path): The path to the folder where the .env file will be written.
+    - env_vars (dict): A dictionary of environment variables to write.
+    """
+    env_file_path = folder_path / ".env"
+    with open(env_file_path, "w") as file:
+        for key, value in env_vars.items():
+            file.write(f"{key}={value}\n")

@@ -2,8 +2,15 @@ import json
 import re
 from typing import Any, Dict, List, Union
 
+from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai.agents.agent_builder.base_agent_executor_mixin import CrewAgentExecutorMixin
-from crewai.agents.parser import CrewAgentParser
+from crewai.agents.parser import (
+    FINAL_ANSWER_AND_PARSABLE_ACTION_ERROR_MESSAGE,
+    AgentAction,
+    AgentFinish,
+    CrewAgentParser,
+    OutputParserException,
+)
 from crewai.agents.tools_handler import ToolsHandler
 from crewai.tools.tool_usage import ToolUsage, ToolUsageErrorException
 from crewai.utilities import I18N, Printer
@@ -13,12 +20,6 @@ from crewai.utilities.exceptions.context_window_exceeding_exception import (
 )
 from crewai.utilities.logger import Logger
 from crewai.utilities.training_handler import CrewTrainingHandler
-from crewai.agents.parser import (
-    AgentAction,
-    AgentFinish,
-    OutputParserException,
-    FINAL_ANSWER_AND_PARSABLE_ACTION_ERROR_MESSAGE,
-)
 
 
 class CrewAgentExecutor(CrewAgentExecutorMixin):
@@ -29,7 +30,7 @@ class CrewAgentExecutor(CrewAgentExecutorMixin):
         llm: Any,
         task: Any,
         crew: Any,
-        agent: Any,
+        agent: BaseAgent,
         prompt: dict[str, str],
         max_iter: int,
         tools: List[Any],
@@ -103,7 +104,8 @@ class CrewAgentExecutor(CrewAgentExecutorMixin):
 
             if self.crew and self.crew._train:
                 self._handle_crew_training_output(formatted_answer)
-
+        self._create_short_term_memory(formatted_answer)
+        self._create_long_term_memory(formatted_answer)
         return {"output": formatted_answer.output}
 
     def _invoke_loop(self, formatted_answer=None):
@@ -151,7 +153,7 @@ class CrewAgentExecutor(CrewAgentExecutorMixin):
                                 )
                                 self.have_forced_answer = True
                         self.messages.append(
-                            self._format_msg(formatted_answer.text, role="user")
+                            self._format_msg(formatted_answer.text, role="assistant")
                         )
 
         except OutputParserException as e:
@@ -176,6 +178,8 @@ class CrewAgentExecutor(CrewAgentExecutorMixin):
         return formatted_answer
 
     def _show_start_logs(self):
+        if self.agent is None:
+            raise ValueError("Agent cannot be None")
         if self.agent.verbose or (
             hasattr(self, "crew") and getattr(self.crew, "verbose", False)
         ):
@@ -188,6 +192,8 @@ class CrewAgentExecutor(CrewAgentExecutorMixin):
             )
 
     def _show_logs(self, formatted_answer: Union[AgentAction, AgentFinish]):
+        if self.agent is None:
+            raise ValueError("Agent cannot be None")
         if self.agent.verbose or (
             hasattr(self, "crew") and getattr(self.crew, "verbose", False)
         ):
@@ -306,24 +312,40 @@ class CrewAgentExecutor(CrewAgentExecutorMixin):
         self, result: AgentFinish, human_feedback: str | None = None
     ) -> None:
         """Function to handle the process of the training data."""
-        agent_id = str(self.agent.id)
-        if (
-            CrewTrainingHandler(TRAINING_DATA_FILE).load()
-            and not self.ask_for_human_input
-        ):
-            training_data = CrewTrainingHandler(TRAINING_DATA_FILE).load()
-            if training_data.get(agent_id):
-                training_data[agent_id][self.crew._train_iteration][
-                    "improved_output"
-                ] = result.output
-                CrewTrainingHandler(TRAINING_DATA_FILE).save(training_data)
+        agent_id = str(self.agent.id)  # type: ignore
+
+        # Load training data
+        training_handler = CrewTrainingHandler(TRAINING_DATA_FILE)
+        training_data = training_handler.load()
+
+        # Check if training data exists, human input is not requested, and self.crew is valid
+        if training_data and not self.ask_for_human_input:
+            if self.crew is not None and hasattr(self.crew, "_train_iteration"):
+                train_iteration = self.crew._train_iteration
+                if agent_id in training_data and isinstance(train_iteration, int):
+                    training_data[agent_id][train_iteration][
+                        "improved_output"
+                    ] = result.output
+                    training_handler.save(training_data)
+                else:
+                    self._logger.log(
+                        "error",
+                        "Invalid train iteration type or agent_id not in training data.",
+                        color="red",
+                    )
+            else:
+                self._logger.log(
+                    "error",
+                    "Crew is None or does not have _train_iteration attribute.",
+                    color="red",
+                )
 
         if self.ask_for_human_input and human_feedback is not None:
             training_data = {
                 "initial_output": result.output,
                 "human_feedback": human_feedback,
                 "agent": agent_id,
-                "agent_role": self.agent.role,
+                "agent_role": self.agent.role,  # type: ignore
             }
             if self.crew is not None and hasattr(self.crew, "_train_iteration"):
                 train_iteration = self.crew._train_iteration

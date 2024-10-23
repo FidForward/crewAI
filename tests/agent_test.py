@@ -1,21 +1,21 @@
 """Test Agent creation and execution basic functionality."""
 
+import os
 from unittest import mock
 from unittest.mock import patch
 
-import os
 import pytest
+from crewai_tools import tool
+
 from crewai import Agent, Crew, Task
 from crewai.agents.cache import CacheHandler
 from crewai.agents.crew_agent_executor import CrewAgentExecutor
+from crewai.agents.parser import AgentAction, CrewAgentParser, OutputParserException
 from crewai.llm import LLM
-from crewai.agents.parser import CrewAgentParser, OutputParserException
 from crewai.tools.tool_calling import InstructorToolCalling
 from crewai.tools.tool_usage import ToolUsage
 from crewai.tools.tool_usage_events import ToolUsageFinished
 from crewai.utilities import RPMController
-from crewai_tools import tool
-from crewai.agents.parser import AgentAction
 from crewai.utilities.events import Emitter
 
 
@@ -116,6 +116,7 @@ def test_custom_llm_temperature_preservation():
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_execute_task():
     from langchain_openai import ChatOpenAI
+
     from crewai import Task
 
     agent = Agent(
@@ -276,7 +277,9 @@ def test_cache_hitting():
         "multiplier-{'first_number': 12, 'second_number': 3}": 36,
     }
 
-    with patch.object(CacheHandler, "read") as read, patch.object(Emitter, "emit") as emit:
+    with patch.object(CacheHandler, "read") as read, patch.object(
+        Emitter, "emit"
+    ) as emit:
         read.return_value = "0"
         task = Task(
             description="What is 2 times 6? Ignore correctness and just return the result of the multiplication tool, you must use the tool.",
@@ -600,6 +603,7 @@ def test_agent_respect_the_max_rpm_set(capsys):
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_respect_the_max_rpm_set_over_crew_rpm(capsys):
     from unittest.mock import patch
+
     from crewai_tools import tool
 
     @tool
@@ -691,6 +695,7 @@ def test_agent_without_max_rpm_respet_crew_rpm(capsys):
 @pytest.mark.vcr(filter_headers=["authorization"])
 def test_agent_error_on_parsing_tool(capsys):
     from unittest.mock import patch
+
     from crewai_tools import tool
 
     @tool
@@ -853,7 +858,9 @@ def test_agent_function_calling_llm():
     tasks = [essay]
     crew = Crew(agents=[agent1], tasks=tasks)
     from unittest.mock import patch
+
     import instructor
+
     from crewai.tools.tool_usage import ToolUsage
 
     with patch.object(
