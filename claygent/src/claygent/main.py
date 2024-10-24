@@ -5,7 +5,7 @@ import sys
 
 def run():
     """
-    Run the crew for LinkedIn, employee scraping, language detection, and HR detection.
+    Run the crew for employee and picture finding, and language detection.
     """
     inputs = {
         'full_name': 'Afonso Pinheiro',
@@ -18,31 +18,17 @@ def run():
     
     crew_instance = ClaygentCrew()
     
-    # Run LinkedIn scraper
-    print("Running LinkedIn scraper...")
-    linkedin_result = crew_instance.run_linkedin_scraper(inputs)
-    print("LinkedIn scraper result:", linkedin_result)
-    
-    # Run employee scraper
-    print("\nRunning employee scraper...")
-    employee_result = crew_instance.run_employee_scraper(inputs)
-    print("Employee scraper result:", employee_result)
+    # Run employee and picture finder
+    employee_picture_result = crew_instance.run_employee_and_picture_finder(inputs)
     
     # Run language detector
-    print("\nRunning language detector...")
-    language_result = crew_instance.run_language_detector(inputs)
-    print("Language detector result:", language_result)
-    
-    # Run HR detector
-    print("\nRunning HR detector...")
-    hr_result = crew_instance.run_hr_detector(inputs)
-    print("HR detector result:", hr_result)
+    # print("\nRunning language detector...")
+    # language_result = crew_instance.run_language_detector(inputs)
+    # print("Language detector result:", language_result)
     
     return {
-        "linkedin_result": linkedin_result,
-        "employee_result": employee_result,
-        "language_result": language_result,
-        "hr_result": hr_result,
+        "employee_picture_result": employee_picture_result,
+        #"language_result": language_result,
     }
 
 def train():
@@ -59,7 +45,7 @@ def train():
     }
     try:
         crew_instance = ClaygentCrew()
-        crew_instance.train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+        crew_instance.train(n_iterations=int(sys.argv[2]), filename=sys.argv[3], inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while training the crew: {e}")
 
@@ -69,7 +55,7 @@ def replay():
     """
     try:
         crew_instance = ClaygentCrew()
-        crew_instance.replay(task_id=sys.argv[1])
+        crew_instance.replay(task_id=sys.argv[2])
     except Exception as e:
         raise Exception(f"An error occurred while replaying the crew: {e}")
 
@@ -86,7 +72,7 @@ def test():
     }
     try:
         crew_instance = ClaygentCrew()
-        crew_instance.test(n_iterations=int(sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
+        crew_instance.test(n_iterations=int(sys.argv[2]), openai_model_name=sys.argv[3], inputs=inputs)
     except Exception as e:
         raise Exception(f"An error occurred while testing the crew: {e}")
 

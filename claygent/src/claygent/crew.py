@@ -30,6 +30,18 @@ class ClaygentCrew():
 			max_iter=5
 		)
 
+	@agent
+	def image_finder(self) -> Agent:
+		return Agent(
+			role=self.agents_config['image_finder']['role'],
+			goal=self.agents_config['image_finder']['goal'],
+			backstory=self.agents_config['image_finder']['backstory'],
+			llm=self.agents_config['image_finder']['llm'],
+			verbose=True,
+			tools=[SerperDevTool(search_url="https://google.serper.dev/images", n_results=10)],
+			max_iter=5
+		)
+
 	@task
 	def linkedin_scraper_task(self) -> Task:
 		return Task(
@@ -62,42 +74,73 @@ class ClaygentCrew():
 			agent=self.people_researcher()
 		)
 
+	@task
+	def profile_picture_finder_task(self) -> Task:
+		return Task(
+			description=self.tasks_config['profile_picture_finder']['description'],
+			expected_output=self.tasks_config['profile_picture_finder']['expected_output'],
+			agent=self.image_finder()
+		)
+
 	@crew
 	def linkedin_crew(self) -> Crew:
 		"""Creates the LinkedIn scraper crew"""
 		return Crew(
-			agents=[self.people_researcher()],
-			tasks=[self.linkedin_scraper_task()],
-			process=Process.sequential,
-			verbose=True,
-		)
+				agents=[self.people_researcher()],
+				tasks=[self.linkedin_scraper_task()],
+				process=Process.sequential,
+				verbose=True,
+			)
 
 	@crew
 	def employee_crew(self) -> Crew:
 		"""Creates the employee scraper crew"""
 		return Crew(
-			agents=[self.people_researcher()],
-			tasks=[self.employee_scraper_task()],
-			process=Process.sequential,
-			verbose=True,
-		)
+				agents=[self.people_researcher()],
+				tasks=[self.employee_scraper_task()],
+				process=Process.sequential,
+				verbose=True,
+			)
 
 	@crew
 	def language_detector_crew(self) -> Crew:
 		"""Creates the language detector crew"""
 		return Crew(
-			agents=[self.people_researcher()],
-			tasks=[self.language_detector_task()],
-			process=Process.sequential,
-			verbose=True,
-		)
+				agents=[self.people_researcher()],
+				tasks=[self.language_detector_task()],
+				process=Process.sequential,
+				verbose=True,
+			)
 
 	@crew
 	def hr_detector_crew(self) -> Crew:
 		"""Creates the HR detector crew"""
 		return Crew(
-			agents=[self.people_researcher()],
-			tasks=[self.hr_detector_task()],
+				agents=[self.people_researcher()],
+				tasks=[self.hr_detector_task()],
+				process=Process.sequential,
+				verbose=True,
+			)
+
+	@crew
+	def profile_picture_crew(self) -> Crew:
+		"""Creates the profile picture finder crew"""
+		return Crew(
+				agents=[self.image_finder()],
+				tasks=[self.profile_picture_finder_task()],
+				process=Process.sequential,
+				verbose=True,
+			)
+
+	@crew
+	def employee_and_picture_crew(self) -> Crew:
+		"""Creates a crew that scrapes employees and then finds their profile pictures"""
+		return Crew(
+			agents=[self.people_researcher(), self.image_finder()],
+			tasks=[
+				self.employee_scraper_task(),
+				self.profile_picture_finder_task()
+			],
 			process=Process.sequential,
 			verbose=True,
 		)
@@ -122,6 +165,16 @@ class ClaygentCrew():
 		result = crew.kickoff(inputs=inputs)
 		return result.raw if result else None
 
+	def run_profile_picture_finder(self, inputs: dict):
+		crew = self.profile_picture_crew()
+		result = crew.kickoff(inputs=inputs)
+		return result.raw if result else None
+
+	def run_employee_and_picture_finder(self, inputs: dict):
+		crew = self.employee_and_picture_crew()
+		result = crew.kickoff(inputs=inputs)
+		return result.raw if result else None
+
 	def run_task(self, task_name, inputs):
 		if task_name == "linkedin_scraper":
 			return self.run_linkedin_scraper(inputs)
@@ -131,6 +184,10 @@ class ClaygentCrew():
 			return self.run_language_detector(inputs)
 		elif task_name == "hr_detector":
 			return self.run_hr_detector(inputs)
+		elif task_name == "profile_picture_finder":
+			return self.run_profile_picture_finder(inputs)
+		elif task_name == "employee_and_picture_finder":
+			return self.run_employee_and_picture_finder(inputs)
 		else:
 			raise ValueError(f"Unknown task: {task_name}")
 

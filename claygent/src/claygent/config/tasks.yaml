@@ -18,13 +18,14 @@ linkedin_scraper:
 employee_scraper:
   description: >
     You are an expert researcher trained on finding employee details for any company given their company name and website URL.
-    You're now going to find for {company} 3 employee names, using the search "site:linkedin.com/in/ {company_url} {country}".
-    If this doesn't work, use the company's official website {company_url} to search for an "about us", "team", or "about the company" page (if they exist).
-    If you don't find employees there, try to search for specific titles such as "coo", "cto", "vp", "director", "manager", "sales" or "engineer".
+    You're now going to find for {company} a maximum of 5 employee names and their LinkedIn profile URLs, using the search "site:linkedin.com/in/ {company} {country}".
     Important: Exclude the CEO {ceo_name} from your search results.
     If you can't find any employees at all (other than the CEO), return an empty list.
+    Ensure that the LinkedIn URLs you find are valid profile URLs (they should match the pattern linkedin.com/in/).
   expected_output: >
-    Return the list of employee names, separated by commas, without quotes or any other formatting, or an empty string if no employees are found.
+    Return a YAML list of dictionaries, each containing "name" and "linkedin_url" keys. 
+    If a LinkedIn URL is not found for an employee, use an empty string for "linkedin_url".
+    Return an empty YAML list if no employees are found.
     Don't include any additional information or commentary in your response.
   agent: people_researcher
 
@@ -50,3 +51,17 @@ human_resources_detector:
     Return a reference to the tweet or article if the person has ever commented on any Human Resources topics, or an empty string otherwise.
     Don't include any additional information or commentary in your response.
   agent: people_researcher
+
+profile_picture_finder:
+  description: >
+    You are an expert at finding profile pictures for employees. Your previous task found a list of employees 
+    with their LinkedIn profile URLs for {company}. Now, for each employee in that list, find their most recent and accurate profile picture.
+    Use Google Images search, accepting ONLY LinkedIn profile pictures - URL starts with "https://media.licdn.com/dms/image/" and includes "profile-displayphoto".
+    Start by searching exclusively the LinkedIn profile URL, and if that doesn't find "profile-displayphoto" use the employee name and {company} in the search query.
+  expected_output: >
+    Return a YAML list of dictionaries, each containing "name" and "profile_picture_url" keys.
+    Present only employees with a profile picture that matches the criteria.
+    If a profile picture URL is not found for an employee, use an empty string for "profile_picture_url".
+    Return an empty YAML list if no profile pictures are found.
+    Don't include any additional information or commentary in your response.
+  agent: image_finder
